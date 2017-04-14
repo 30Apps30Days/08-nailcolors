@@ -22,36 +22,53 @@ function f(name, params) {
   return name + '(' + params.join(', ') + ')';
 }
 
+function randomInt(max) { return Math.floor(Math.random() * (max + 1)); }
+
+var IS_CORDOVA = !!window.cordova;
+
 var app = {
-  // options
-  prefs: null,
+  options: {
+    debug: false
+  },
 
   // internal
-  //
+  $main: null,
+  color: [0, 0, 0],
 
   init: function () {
     bindEvents(this, {
       'document': {'deviceready': this.ready},
-      'form input': {'change': this.change}
+      'form input': {'change': this.change},
+      'main': {'click': this.next}
     });
+
+    if(!IS_CORDOVA) {
+      this.options.debug && console.log('NOT cordova');
+      bindEvents(this, {'window': {'load': this.ready}});
+    }
     return this;
   },
 
   ready: function () {
     // Store DOM nodes
-    // TODO
-
-    // Grab preferences
-    // this.prefs = plugins.appPreferences;
-    this.start();
-    return this;
+    this.$main = document.querySelector('main');
+    return this.next();
   },
 
   change: function () {
+    this.options.debug && console.log('.change()');
     return this;
   },
 
+  next: function () {
+    this.options.debug && console.log('.next()');
+    this.color = [randomInt(255), randomInt(255), randomInt(255)];
+    return this.render();
+  },
+
   render: function () {
+    this.options.debug && console.log('.render()');
+    this.$main.style.backgroundColor = 'rgb(' + this.color.join(', ') + ')';
     return this;
   }
 };
